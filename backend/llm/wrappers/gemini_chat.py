@@ -5,10 +5,10 @@ Features:
 - Prompting and request generation
 - Structured output handling
 - Memory for conversational context
+- Retries on rate limiting
 
 To-Do:
 - Function calling
-- Error handling and retries
 """
 
 from dotenv import load_dotenv
@@ -16,6 +16,7 @@ import os
 import json
 import requests 
 from pydantic import BaseModel
+import time
 
 def prettify(string: str) -> str:
     # turn a camel case string into a human readable string
@@ -37,8 +38,15 @@ def get_response(query: str, api_key: str, model: str = "gemini-1.5-pro-latest")
 
     response = requests.post(url, headers=headers, json=payload, params=params)
 
+    if response.status_code == 429:
+        # wait and retry
+        print("Rate limited. Waiting 5 seconds and retrying.")
+        time.sleep(5)
+        return get_response(query, api_key, model)
+    
     if response.status_code != 200:
         raise Exception(f"Failed to get response: {response.text}")
+    
     
     return response.json()
 
