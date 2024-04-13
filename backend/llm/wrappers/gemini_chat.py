@@ -42,6 +42,13 @@ def get_response(query: str, api_key: str, model: str = "gemini-1.5-pro-latest")
     
     return response.json()
 
+"""
+Abstract class for Gemini API
+Can be inherited to add memory
+
+Use the structure parameter to define the schema of the response
+If structure is provided for a response, the response structure will override the constructor structure param
+"""
 class GeminiClient:
     def __init__(self, 
                  model: str = "gemini-1.5-pro-latest", 
@@ -59,13 +66,16 @@ class GeminiClient:
         self.system_message = system_message
         self.verbose = verbose
 
-    def __call__(self, prompt: str) -> dict | BaseModel:
+    def __call__(self, prompt: str, structure: BaseModel | None = None, 
+                 context: str | None = None) -> dict | BaseModel:
         prompt = f"""
             {self.system_message if self.system_message else ""}
             Respond to the provided prompt. Your output should be a JSON object that matches the provided schema.
             Prompt: {prompt}
-            Schema: {self.structure.model_json_schema()}
-        """ if self.structure else prompt
+            Schema: {structure.model_json_schema() if structure else self.structure.model_json_schema()}
+
+            {"Context: " + context if context else ""}
+        """ if self.structure or structure else prompt
 
         response = get_response(prompt, self.api_key, self.model)
 
@@ -78,7 +88,11 @@ class GeminiClient:
         else:
             response_text = response['candidates'][0]['content']['parts'][0]['text']
             response_dict = json.loads(response_text)
-            return self.structure(**response_dict) if self.structure else response_dict
+            if structure:
+                return structure(**response_dict)
+            if self.structure:
+                return self.structure(**response_dict)
+            return response_dict
         
 # Inherited class with memory
 class GeminiClientWithMemory(GeminiClient):
@@ -96,9 +110,11 @@ class GeminiClientWithMemory(GeminiClient):
             memory.extend([{"system_message": f"Adhere to this schema with every response: {self.structure.model_json_schema()}"}])
         self.memory = memory
 
-    def __call__(self, prompt: str):
+    def __call__(self, prompt: str, context: str | None = None) -> dict | BaseModel:
         self.memory.extend([{"human_message": prompt}])
         chat_history: str = memory_to_string(self.memory)
+        if context:
+            chat_history += "Context: " + context + "\n"
         chat_history += "AI Message:"
 
         response = get_response(chat_history, self.api_key, self.model)
