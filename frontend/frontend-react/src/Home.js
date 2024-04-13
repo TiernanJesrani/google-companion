@@ -4,7 +4,7 @@ import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import { Box } from '@mui/material';
 import { useState, useEffect } from 'react';
-import Space from './components/Space';
+import Space from './components/SpaceCard';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -12,13 +12,23 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-
+import { googleLogout, useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 import mhacks from './static/images/mhacks.png'
 import campus from './static/images/campus.jpeg'
 
 function Home() {
   const [showCreate, setShowCreate] = useState(false)
   const [nameToCreate, setNameToCreate] = useState("")
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [user, setUser ] = useState([]);
+  const [profile, setProfile ] = useState([]);
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      setUser(codeResponse)
+    },
+    onError: (error) => console.log('Login Failed:', error)
+});
   const handleClickOpen = () => {
     setShowCreate(true);
   };
@@ -45,9 +55,28 @@ function Home() {
     ];
   });
   useEffect(() => {
+    if (user) {
+      console.log(user.access_token)
+      axios
+          .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
+              headers: {
+                  Authorization: `Bearer ${user.access_token}`,
+                  Accept: 'application/json'
+              }
+          })
+          .then((res) => {
+              setProfile(res.data);
+              setLoggedIn(true)
+          })
+          .catch((err) => console.log(err));
+    }
     // Store gridItems in local storage whenever they change
     localStorage.setItem('gridItems', JSON.stringify(gridItems));
-  }, [gridItems]);
+  }, [gridItems], [user]);
+  const logOut = () => {
+    googleLogout();
+    setProfile(null);
+};
 
   function convertToRoute(str) {
     return str
@@ -57,6 +86,14 @@ function Home() {
       .replace(/\s+/g, '-') 
       .replace(/-+/g, '-'); 
   }
+
+  const responseMessage = (response) => {
+    setLoggedIn(true)
+    console.log(response);
+  };
+  const errorMessage = (error) => {
+      console.log(error);
+  };
 
 
   const handleClose = (name) => {
@@ -79,11 +116,33 @@ function Home() {
     ])
     setShowCreate(false);
   };
-  
+  if (!loggedIn) {
+    return (
+      <div>
+            <h2>React Google Login</h2>
+            <br />
+            <br />
+            {profile ? (
+                <div>
+                    <img src={profile.picture} alt="user image" />
+                    <h3>User Logged in</h3>
+                    <p>Name: {profile.name}</p>
+                    <p>Email Address: {profile.email}</p>
+                    <br />
+                    <br />
+                    <button onClick={logOut}>Log out</button>
+                </div>
+            ) : (
+                <button onClick={login}>Sign in with Google 🚀 </button>
+            )}
+        </div>
+    );
+  }
   return (
+    
     <div className="App">
       <header className="App-header">
-      <Grid container spacing={8}>
+      <Grid container spacing={8} sx={{width:'80%'}}>
           {gridItems.map((item, index) => ( 
             <Grid item xs={6} key={index}>
             <Box display="flex" justifyContent="center" alignItems="center" height="100%">

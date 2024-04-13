@@ -39,8 +39,7 @@ const Space = (props) => {
       if (props.button_title === 'Create new' && props.setShowCreate) {
           props.setShowCreate(true)
       } else {
-        
-        navigate(`/page/${convertToRoute(props.name)}`);
+        navigate(`/spaces/${convertToRoute(props.name)}`);
       }
     }
 
