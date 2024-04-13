@@ -47,22 +47,31 @@ class GeminiClient:
                  model: str = "gemini-1.5-pro-latest", 
                  api_key: str=None, 
                  structure: BaseModel = None, 
-                 debug: bool=False):
+                 debug: bool=False,
+                 system_message: str=None,
+                 verbose: bool=False):
         load_dotenv()
         GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
         self.model = model
         self.api_key = api_key or GEMINI_API_KEY
-        self.debug = debug
         self.structure = structure
+        self.debug = debug
+        self.system_message = system_message
+        self.verbose = verbose
 
     def __call__(self, prompt: str) -> dict | BaseModel:
         prompt = f"""
+            {self.system_message if self.system_message else ""}
             Respond to the provided prompt. Your output should be a JSON object that matches the provided schema.
             Prompt: {prompt}
             Schema: {self.structure.model_json_schema()}
         """ if self.structure else prompt
 
         response = get_response(prompt, self.api_key, self.model)
+
+        if self.verbose:
+            print("Prompt: ", prompt)
+            print("Raw response: ", response)
 
         if self.debug:
             return response  # Returns the JSON response directly
