@@ -38,7 +38,7 @@ class Document(BaseModel):
     content: str
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.name}: \n {self.content}"
 
 class CalendarEvent(BaseModel):
     name: str
