@@ -130,19 +130,23 @@ class GeminiClientWithMemory(GeminiClient):
 
         response = get_response(chat_history, self.api_key, self.model)
 
-        self.memory.extend([{"AI_Message": response['candidates'][0]['content']['parts'][0]['text']}])
+        if not structure and not self.structure:
+            self.memory.extend([{"AI_Message": response['candidates'][0]['content']['parts'][0]['text']}])
 
-        if self.verbose:
-            print(memory_to_string(self.memory))
+        # if self.verbose:
+        #    print(memory_to_string(self.memory))
 
         if self.debug:
             return response
         else:
             response_text = response['candidates'][0]['content']['parts'][0]['text']
+            # print(response_text)
             response_dict = json.loads(response_text)
             if structure:
+                self.memory.extend([{"AI_Message": response_dict}])
                 return structure(**response_dict)
             if self.structure:
+                self.memory.extend([{"AI_Message": response_dict}])
                 return self.structure(**response_dict)
             return response_dict
 
