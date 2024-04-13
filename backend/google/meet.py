@@ -277,13 +277,12 @@ def conjoin_transcript_entries(transcript_entries):
 
 def main():
   authenticate_create_token()
-  # events = get_events_with_meets()
   events = get_events()
   print(events)
 
-  # attendees_entries = get_transcript_information(events)
-  
-  # print(attendees_entries)
+  events_with_meets = get_events_with_meets()
+  attendees_entries = get_transcript_information(events_with_meets)
+  print(attendees_entries)
 
 
 if __name__ == '__main__':
