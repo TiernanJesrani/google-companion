@@ -4,6 +4,7 @@ Abstract wrapper for the Gemini API.
 Features:
 - Prompting and request generation
 - Structured output handling
+- Memory for conversational context
 
 To-Do:
 - Function calling
@@ -104,7 +105,6 @@ class GeminiClientWithMemory(GeminiClient):
             response_text = response['candidates'][0]['content']['parts'][0]['text']
             response_dict = json.loads(response_text)
             return self.structure(**response_dict) if self.structure else response_dict
-
 
 # Example Usage:
 if __name__ == "__main__":
