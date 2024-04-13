@@ -32,7 +32,7 @@ def get_response(query: str, api_key: str, model: str = "gemini-1.5-pro-latest")
         "contents": [
             {"parts": [{"text": query}]}
         ],
-        "generationConfig": {"response_mime_type": "application/json"}
+        "generationConfig": {"response_mime_type": "application/json", "temperature" : 0.1}
     }
     params = {'key': api_key}
 
