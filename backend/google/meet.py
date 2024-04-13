@@ -3,7 +3,6 @@ import datetime
 import os.path
 
 from google.apps import meet_v2
-
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -274,174 +273,17 @@ def conjoin_transcript_entries(transcript_entries):
   attendee_entry.append(attendees)
   attendee_entry.append(entries)
   return entries
-  
-
-
-# def calendar_meet():
-  
-#   try:
-#     # create calendar service 
-#     service = build("calendar", "v3", credentials=creds)
-    
-#     # create space client
-#     client_space = meet_v2.SpacesServiceClient(credentials=creds)
-
-#     # create transcript client
-#     client_rec = meet_v2.ConferenceRecordsServiceClient(credentials=creds)
-
-
-#     # Call the Calendar API
-#     # Get current UTC time
-#     current_utc_time = datetime.datetime.utcnow()
-
-#     # Define UTC timezone
-#     utc_timezone = datetime.timezone.utc
-
-#     # Convert UTC time to Eastern Standard Time (EST) by adding 5 hours (UTC-5)
-#     est_timezone_offset = datetime.timedelta(hours=-5)
-#     current_est_time = current_utc_time.replace(tzinfo=utc_timezone) + est_timezone_offset
-
-#     # Subtract a week from the current date
-#     one_week_ago = current_est_time - datetime.timedelta(days=7)
-
-#     # Format the result in ISO 8601 format
-#     one_week_ago_iso = one_week_ago.isoformat()
-
-#     events_result = (
-#         service.events()
-#         .list(
-#             calendarId="primary",
-#             timeMin=one_week_ago_iso,
-#             maxResults=10,
-#             singleEvents=True,
-#             orderBy="startTime",
-#         )
-#         .execute()
-#     )
-#     #print(events_result)
-#     #print()
-#     events = events_result.get("items", [])
-
-#     if not events:
-#       print("No upcoming events found.")
-#       return
-
-    
-#     for event in events:
-#       selected_recordings = []
-#       if "hangoutLink" in event:
-#           conf_id = get_conference_id(event)
-#           request = meet_v2.GetSpaceRequest(
-#             name=f"spaces/{conf_id}"
-#           )
-#           space = client_space.get_space(request=request)
-#           #print(space)
-#           request = meet_v2.ListConferenceRecordsRequest()
-#           page_result = client_rec.list_conference_records(request=request)
-
-#           for record in page_result:
-#             if record.space == space.name:
-#                 selected_recordings.append(record.name)
-
-#           for rec in selected_recordings:
-#               # request_par = meet_v2.ListTranscriptsRequest(
-#               #     parent=rec.,
-#               # )
-#               request = meet_v2.ListTranscriptsRequest(
-#                 parent=rec
-#               ) 
-#               # # Make the request
-#               # partic = client_rec.list_participants(request=request_par)
-#               # participant_list = []
-#               # for par in partic:
-#               #    participant_list.append(par.signedin_user.display_name)
-#               # Make the request
-#               page_result = client_rec.list_transcripts(request=request)
-#               if page_result.transcripts:
-#                 for transcript in page_result.transcripts:
-#                   #print(transcript)
-
-#                   request = meet_v2.ListTranscriptEntriesRequest(
-#                     parent=transcript.name,
-#                   )
-#                   transcript_entries = client_rec.list_transcript_entries(request=request)
-#                   #print(transcript_entries)
-                  
-#                   curr_participant = transcript_entries.transcript_entries[0].participant
-#                   entries = []
-#                   text = ""
-                 
-#                   request_pariticpant_individual = meet_v2.GetParticipantRequest(
-#                         name=curr_participant
-#                   )
-                  
-#                   for entry in transcript_entries:
-                    
-#                     if curr_participant != "" and curr_participant != entry.participant:
-#                       request_pariticpant_individual = meet_v2.GetParticipantRequest(
-#                         name=curr_participant
-#                       )
-#                       participant = client_rec.get_participant(request=request_pariticpant_individual)
-#                       text = f"{participant.signedin_user.display_name}: " + text
-#                       entries.append(text)
-#                       text = ""
-#                       curr_participant = entry.participant
-#                     text = text + entry.text
-                 
-
-#                   request_pariticpant_individual = meet_v2.GetParticipantRequest(
-#                     name=curr_participant
-#                   )
-#                   participant = client_rec.get_participant(request=request_pariticpant_individual)
-
-#                   text = f"{participant.signedin_user.display_name}: " + text
-#                   entries.append(text)
-#                   print(entries)
-                      
-
-
-#       #print(selected_recordings)
-#           #print(page_result)
-#           #google_meet_events.append(event)
-#     #print(google_meet_events)
-
-    
-      
-
-      
-#     return
-
-
-
-#     # for event in events:
-#     #   start = event["start"].get("dateTime", event["start"].get("date"))
-#     #   print(start)
-#     #   if "summary" in event.keys():
-#     #     print(event["summary"])
-#     #   if "description" in event.keys():
-#     #     print(event["description"])
-
-#     #parent=f"conferenceRecords/{response.name}"
-#     #parent=f"conferenceRecords/{conf_id}"
-
-
-#      # Prints the start and name of the next 10 events
-#     #get_conference_id(events_result)
-#     #for event in events:
-#     #  print(get_conference_id(event))
-#     #  sample_get_recording(creds, get_conference_id(event))
-
-#   except HttpError as error:
-#     print(f"An error occurred: {error}")
 
 
 def main():
   authenticate_create_token()
-  events = get_events_with_meets()
+  # events = get_events_with_meets()
+  events = get_events()
+  print(events)
 
-  attendees_entries = get_transcript_information(events)
+  # attendees_entries = get_transcript_information(events)
   
-  print(attendees_entries)
+  # print(attendees_entries)
 
 
 if __name__ == '__main__':
