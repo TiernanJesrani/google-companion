@@ -118,7 +118,10 @@ class GeminiClientWithMemory(GeminiClient):
             memory.extend([{"system_message": f"Adhere to this schema with every response: {self.structure.model_json_schema()}"}])
         self.memory = memory
 
-    def __call__(self, prompt: str, context: str | None = None) -> dict | BaseModel:
+    def __call__(self, prompt: str, structure: BaseModel | None = None, 
+                 context: str | None = None) -> dict | BaseModel:
+        if structure:
+            self.memory.extend([{"system_message": f"For the next message, adhere to the below schema: {structure.model_json_schema()}"}])
         self.memory.extend([{"human_message": prompt}])
         chat_history: str = memory_to_string(self.memory)
         if context:
@@ -137,7 +140,11 @@ class GeminiClientWithMemory(GeminiClient):
         else:
             response_text = response['candidates'][0]['content']['parts'][0]['text']
             response_dict = json.loads(response_text)
-            return self.structure(**response_dict) if self.structure else response_dict
+            if structure:
+                return structure(**response_dict)
+            if self.structure:
+                return self.structure(**response_dict)
+            return response_dict
 
 # Example Usage:
 if __name__ == "__main__":

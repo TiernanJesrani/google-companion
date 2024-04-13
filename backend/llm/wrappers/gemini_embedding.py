@@ -63,7 +63,6 @@ class GeminiEmbeddingClient:
     def __call__(self, input: str | list[str],  batch: bool = False) -> np.ndarray:
         response = get_response(input, self.api_key, self.model) if not batch else get_response_batch(input, self.api_key, self.model)
         
-        print(response)
         if not batch:
             return np.array(response['embedding']['values'])
         else:
