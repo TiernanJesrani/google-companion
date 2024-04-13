@@ -7,7 +7,6 @@ SYSTEM_MESSAGE = """
     You can generate meeting summaries, tasks, email drafts, etc. using the context of the space you are in.
 """
 
-
 SUMMARIZE_TRANSCRIPT_PROMPT = """
     Given the below transcript, succinctly summarize the main points of the conversation.
     Transcript:
@@ -28,12 +27,12 @@ GENERATE_TASK_FOR_USER_PROMPT = """
 """
 
 GENERATE_FOLLOW_UP_TASKS_PROMPT = """
-    Given the below meeting summary, generate a list of potential follow up tasks to be completed.
+    Given the below meeting transcript, generate a list of potential follow up tasks to be completed.
 
     Generate the follow ups specifically for the user {user}.
 
-    Meeting Summary:
-    {meeting_summary}
+    Meeting:
+    {transcript}
 
     Tasks:
 """
