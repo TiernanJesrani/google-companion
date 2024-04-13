@@ -4,22 +4,18 @@ import { useLocation, useParams } from 'react-router-dom';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
-import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import PrintIcon from '@mui/icons-material/Print';
-import ShareIcon from '@mui/icons-material/Share';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Button from '@mui/material/Button';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import Calendar from './Calendar';
-
-const actions = [
-    { icon: <FileCopyIcon />, name: 'Copy' },
-    { icon: <SaveIcon />, name: 'Save' },
-    { icon: <PrintIcon />, name: 'Print' },
-    { icon: <ShareIcon />, name: 'Share' },
-  ];
+import googlemeet from '../static/images/google-meet.png'
+import docs from '../static/images/docs.png'
+import PastEvents from './PastEvents'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -49,10 +45,25 @@ function a11yProps(index) {
 
 export default function App() {
   const [value, setValue] = React.useState(0);
-  const [gridItem, setGridItem] = React.useState({})
+  const [showAdd, setShowAdd] = React.useState(false)
   const route = useLocation()
+  const actions = [
+    { 
+        icon: <img src={googlemeet} className="google-meet-icon" style={{ width: '24px', height: '24px' }} alt="Google Meet" />, 
+        name: 'Google Meet', 
+        onClick: () => setShowAdd(true) 
+    },
+    { 
+      icon: <img src={docs} className="google-meet-icon" style={{ width: '24px', height: '24px' }} alt="Doocuments" />, 
+      name: 'Documents', 
+      onClick: () => setShowAdd(true) 
+    } 
+  ];
   const handleChange = (event, newValue) => {
     setValue(newValue);
+  };
+  const handleClose = () => {
+    setShowAdd(false);
   };
 
   function getData(param) {
@@ -66,7 +77,7 @@ export default function App() {
   }
 
   return (
-    <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: 'background.default', p: 4 }}>
+    <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: '#4285F4', p: 2 }}>
       <Box sx={{ 
           borderRadius: 4, 
           bgcolor: 'background.paper', 
@@ -85,13 +96,11 @@ export default function App() {
             color="inherit"
         >
             <div>{getData("name")}</div>
-        </Link>
-        {/* <Typography color="text.primary"><div>{getData("date_created")}</div></Typography> */}
-       {
+        </Link>       
         <Calendar
             date={getData("date_created")}
        />
-       }
+       
         </Breadcrumbs>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered>
           <Tab label="Upcoming" {...a11yProps(0)} />
@@ -101,10 +110,7 @@ export default function App() {
           Content for Tab One
         </TabPanel>
         <TabPanel value={value} index={1}>
-          Content for Tab Two
-        </TabPanel>
-        <TabPanel value={value} index={2}>
-          Content for Tab Three
+          <PastEvents />
         </TabPanel>
       </Box>
         <SpeedDial
@@ -117,9 +123,44 @@ export default function App() {
                 key={action.name}
                 icon={action.icon}
                 tooltipTitle={action.name}
+                onClick={action.onClick}
                 />
             ))}
         </SpeedDial>
+        {showAdd &&  <React.Fragment>
+      <Dialog
+        open={showAdd}
+        onClose={handleClose}
+        PaperProps={{
+          component: 'form',
+          onSubmit: (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const formJson = Object.fromEntries(formData.entries());
+            const name = formJson.name;
+            console.log(`Created Space named ${name}`)
+            handleClose(name);
+          },
+        }}
+      >
+        <DialogTitle>Add meeting</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Select meetings to add to {getData("name")}
+          </DialogContentText>
+          <FormGroup>
+            <FormControlLabel control={<Checkbox />} label="Label" />
+            <FormControlLabel control={<Checkbox />} label="Label" />
+            <FormControlLabel control={<Checkbox />} label="Label" />
+            <FormControlLabel control={<Checkbox />} label="Label" />
+        </FormGroup>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button type="submit">Create</Button>
+        </DialogActions>
+      </Dialog>
+    </React.Fragment>}
     </Box>
   );
 }

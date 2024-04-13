@@ -4,7 +4,7 @@ import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import { Box } from '@mui/material';
 import { useState, useEffect } from 'react';
-import Space from './components/Space';
+import Space from './components/SpaceCard';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -12,13 +12,18 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-
+import { googleLogout, useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 import mhacks from './static/images/mhacks.png'
 import campus from './static/images/campus.jpeg'
 
 function Home() {
   const [showCreate, setShowCreate] = useState(false)
   const [nameToCreate, setNameToCreate] = useState("")
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [user, setUser ] = useState([]);
+  const [profile, setProfile ] = useState([]);
+  
   const handleClickOpen = () => {
     setShowCreate(true);
   };
@@ -45,6 +50,7 @@ function Home() {
     ];
   });
   useEffect(() => {
+    
     // Store gridItems in local storage whenever they change
     localStorage.setItem('gridItems', JSON.stringify(gridItems));
   }, [gridItems]);
@@ -57,6 +63,14 @@ function Home() {
       .replace(/\s+/g, '-') 
       .replace(/-+/g, '-'); 
   }
+
+  const responseMessage = (response) => {
+    setLoggedIn(true)
+    console.log(response);
+  };
+  const errorMessage = (error) => {
+      console.log(error);
+  };
 
 
   const handleClose = (name) => {
@@ -79,11 +93,11 @@ function Home() {
     ])
     setShowCreate(false);
   };
-  
   return (
+    
     <div className="App">
       <header className="App-header">
-      <Grid container spacing={8}>
+      <Grid container spacing={8} sx={{width:'80%'}}>
           {gridItems.map((item, index) => ( 
             <Grid item xs={6} key={index}>
             <Box display="flex" justifyContent="center" alignItems="center" height="100%">
