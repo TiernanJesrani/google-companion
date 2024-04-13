@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 """
 SCHEMAS FOR GENERATION TASKS 
@@ -37,17 +37,37 @@ class Document(BaseModel):
     name: str
     content: str
 
+    def __str__(self):
+        return f"{self.name}"
+
 class CalendarEvent(BaseModel):
     name: str
     description: str
     time: str
 
+    def __str__(self):
+        return f"{self.name} at {self.time}"
+
 class Meeting(CalendarEvent):
     attendees: list[str]
     transcript: str
 
+    def __str__(self):
+        return f"{self.name} at {self.time} with {', '.join(self.attendees)}"
+
 class Space(BaseModel):
-    name: str
-    description: str
-    calendar_events: list[CalendarEvent] | None
-    documents: list[Document] | None
+    space_name: str
+    user_name: str
+    description: str | None = None
+    calendar_events: list[CalendarEvent] | None = None
+    documents: list[Document] | None = None
+
+    def __str__(self):
+        events = "\n".join([event for event in self.calendar_events]) if self.calendar_events else "No calendar events"
+        docs = "\n".join([doc for doc in self.documents]) if self.documents else "No documents"
+
+        return f"""
+        Space: {self.space_name}, 
+        Description: {self.description}, 
+        Calendar Events: {events}, 
+        Documents: {docs}"""
