@@ -11,10 +11,13 @@ import Stack from '@mui/material/Stack';
 import Popper from '@mui/material/Popper';
 import Fade from '@mui/material/Fade';
 import CommentRoundedIcon from '@mui/icons-material/CommentRounded';
+import { useNavigate } from 'react-router-dom';
+
 
 const Space = (props) => {
     const [open, setOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const navigate = useNavigate();
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -23,9 +26,21 @@ const Space = (props) => {
     const canBeOpen = open && Boolean(anchorEl);
     const id = canBeOpen ? 'transition-popper' : undefined;
 
+    function convertToRoute(str) {
+      return str
+        .trim() 
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/gi, '') 
+        .replace(/\s+/g, '-') 
+        .replace(/-+/g, '-'); 
+    }
+
     const onClickButton = (event) => {
       if (props.button_title === 'Create new' && props.setShowCreate) {
           props.setShowCreate(true)
+      } else {
+        
+        navigate(`/page/${convertToRoute(props.name)}`);
       }
     }
 
@@ -62,8 +77,8 @@ const Space = (props) => {
       <CardContent orientation="horizontal">
         <div>
         <Stack direction="row" spacing={1} alignItems="center">
-          {props.tags.map((tag) => (
-            <Chip color="primary" label={tag} size="small" />
+          {props.tags.map((tag, index) => (
+            <Chip color="primary" label={tag} key={index} size="small" />
           ))
           }
         </Stack>
