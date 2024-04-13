@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@date-io/dayjs": "^3.0.0"
+  }
+}
