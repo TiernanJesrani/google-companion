@@ -1,7 +1,7 @@
-from wrappers.gemini_chat import GeminiClient, GeminiClientWithMemory
-from retriever import Retriever, chunk_text
-import prompts
-from schemas import (
+from llm.wrappers.gemini_chat import GeminiClient, GeminiClientWithMemory
+from llm.retriever import Retriever, chunk_text
+import llm.prompts as prompts
+from llm.schemas import (
     MeetingTasks,
     MeetingSummary,
     EmailDrafts,

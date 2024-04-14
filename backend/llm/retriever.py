@@ -1,5 +1,5 @@
-from wrappers.gemini_embedding import GeminiEmbeddingClient
-from wrappers.gemini_chat import GeminiClient
+from llm.wrappers.gemini_embedding import GeminiEmbeddingClient
+from llm.wrappers.gemini_chat import GeminiClient
 from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.retrievers import EnsembleRetriever
