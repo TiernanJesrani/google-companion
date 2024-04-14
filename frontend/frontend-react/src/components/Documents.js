@@ -13,9 +13,10 @@ export default function Document(props) {
             <FormGroup >
             {docs.length !== 0 ? (
                 docs.slice(0, 10).map((doc) => (
-                    
-                        <FormControlLabel src={doc.webViewLink} control={<Checkbox />} label={doc.name} />
-                        
+                    <div>
+                        <FormControlLabel control={<Checkbox />} label={doc.name} />
+                        <a target="_blank" href={doc.webViewLink}><img style= {{height:'20px', width:'20px'}}src={DriveIcon}/></a>
+                    </div>
                     
                 ))
             ) : (
