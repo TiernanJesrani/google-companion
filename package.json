@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@date-io/dayjs": "^3.0.0",
-    "react-chatbot-kit": "^2.2.2"
-  }
-}
