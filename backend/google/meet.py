@@ -108,12 +108,13 @@ def get_transcript_information(events):
   # dict of transcript info for each selected meeting
   transcript_info = {}
   for event in events:
+    
     # get the space associated with an event
     space = get_space(event)
-  
+    print("Space: ", space)
     # get the records associated with that space
     conference_records = get_conference_records(space)
-    
+    print("Conference records: ", conference_records)
     if len(conference_records) == 0:
       print("empty")
     else:
@@ -191,8 +192,9 @@ def get_transcripts(conference_records):
         parent=record
       ) 
       transcripts_for_one_conference = client_rec.list_transcripts(request=request)
+      print("transcripts_for_one_conference", transcripts_for_one_conference)
       if not transcripts_for_one_conference.transcripts:
-        return []
+        continue
       
       else:
         for transcript in transcripts_for_one_conference:
