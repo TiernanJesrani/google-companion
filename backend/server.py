@@ -30,6 +30,8 @@ CORS(app)
 
 creds = None
 
+creds = None
+
 @app.route("/login-test")
 def login_test():
     authenticate_create_token()
@@ -95,6 +97,7 @@ def create_space(space_name: str):
 @app.route("/get-summary/<space_name>/<meeting_id>")
 def get_summary(space_name, meeting_id):
     # get the transcript information of the meeting
+    global creds
     authenticate_create_token()
     events_with_meets = get_events_with_meets()
     attendees_entries = get_transcript_information(events_with_meets)
