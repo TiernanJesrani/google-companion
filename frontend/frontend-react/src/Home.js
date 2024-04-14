@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
@@ -12,21 +11,18 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { googleLogout, useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
 import mhacks from './static/images/mhacks.png'
 import campus from './static/images/campus.jpeg'
 
 function Home() {
   const [showCreate, setShowCreate] = useState(false)
-  const [nameToCreate, setNameToCreate] = useState("")
-  const [loggedIn, setLoggedIn] = useState(false)
-  const [user, setUser ] = useState([]);
-  const [profile, setProfile ] = useState([]);
+
+  function clearStorage() {
+    console.log(localStorage.getItem('loggedIn'))
+    console.log('Clearing sotrage')
+    localStorage.clear()
+  }
   
-  const handleClickOpen = () => {
-    setShowCreate(true);
-  };
   const [gridItems, setGridItems] = useState(() => {
     // Retrieve the items from local storage; if none exist, use the default array
     const savedItems = localStorage.getItem('gridItems');
@@ -64,15 +60,6 @@ function Home() {
       .replace(/-+/g, '-'); 
   }
 
-  const responseMessage = (response) => {
-    setLoggedIn(true)
-    console.log(response);
-  };
-  const errorMessage = (error) => {
-      console.log(error);
-  };
-
-
   const handleClose = (name) => {
     let date = new Date();
     let formatter = new Intl.DateTimeFormat('en-US', {
@@ -93,6 +80,16 @@ function Home() {
     ])
     setShowCreate(false);
   };
+
+  if (localStorage.getItem('loggedIn')!== "true") {
+    console.log("logging in")
+    fetch('http://127.0.0.1:5000/login-test').then((response) => {
+      if (!response.ok) console.log(response);
+      console.log(response)
+      localStorage.setItem('loggedIn', "true");
+      return response.json();
+    })
+  }
   return (
     
     <div className="App">
@@ -164,7 +161,7 @@ function Home() {
       </Dialog>
     </React.Fragment>}
       </header>
-      
+      <button onClick={clearStorage}>DO NOT PRESS ACCIDENTALLY -- Clear Local Storage</button>
     </div>
   );
 }

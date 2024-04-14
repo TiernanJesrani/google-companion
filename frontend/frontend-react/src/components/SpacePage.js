@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Tab, Tabs, Typography, Breadcrumbs, Link } from '@mui/material';
-import { useLocation, useParams } from 'react-router-dom';
+import { json, useLocation, useParams } from 'react-router-dom';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
@@ -15,10 +15,11 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Calendar from './Calendar';
 import googlemeet from '../static/images/google-meet.png'
 import docs from '../static/images/docs.png'
-import PastEvents from './PastEvents'
+import MeetingCard from './PastEvents'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
+
   return (
     <div
       role="tabpanel"
@@ -47,16 +48,22 @@ export default function App() {
   const [value, setValue] = React.useState(0);
   const [showAdd, setShowAdd] = React.useState(false)
   const route = useLocation()
+  const [meetings, setMeetings] = React.useState([])
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
+  const [chosenMeetings, setChosenMeetings] = React.useState([]);
+  const [checkedMeetings, setCheckedMeetings] = React.useState([]);
+
   const actions = [
     { 
         icon: <img src={googlemeet} className="google-meet-icon" style={{ width: '24px', height: '24px' }} alt="Google Meet" />, 
         name: 'Google Meet', 
-        onClick: () => setShowAdd(true) 
+        onClick: () => prepAdd(true) 
     },
     { 
       icon: <img src={docs} className="google-meet-icon" style={{ width: '24px', height: '24px' }} alt="Doocuments" />, 
       name: 'Documents', 
-      onClick: () => setShowAdd(true) 
+      onClick: () => prepAdd(true) 
     } 
   ];
   const handleChange = (event, newValue) => {
@@ -65,14 +72,51 @@ export default function App() {
   const handleClose = () => {
     setShowAdd(false);
   };
+  const prepAdd = (setShow) => {
+    setShowAdd(setShow)
+  }
+  const handleCheckboxChange = (meeting, isChecked) => {
+    if (isChecked) {
+      // Add the meeting to the array if it's checked
+      setCheckedMeetings(prevMeetings => [...prevMeetings, meeting]);
+    } else {
+      // Remove the meeting from the array if it's unchecked
+      setCheckedMeetings(prevMeetings => prevMeetings.filter(m => m.id !== meeting.id));
+    }
+  };
+
+  function choseMeetings() {
+    setChosenMeetings(checkedMeetings)
+
+    console.log(chosenMeetings)
+  }
+
+  React.useEffect(() => {
+    setIsLoading(true);
+    console.log("fetching")
+    fetch('http://127.0.0.1:5000/add')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to load data');
+        }
+        console.log('dub')
+        return response.json();
+      })
+      .then(data => {
+        setMeetings(data.meetings);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching data", error);
+        setError(error.toString());
+        setIsLoading(false);
+      });
+  }, []);
 
   function getData(param) {
     const savedItems = JSON.parse(localStorage.getItem('gridItems'));
-    console.log(route)
-    console.log("route: " + savedItems[0].route)
+
     const item = savedItems.find(item => route.pathname.split('/')[2] === item.route);
-    
-    console.log(item)
     return item[param]
   }
 
@@ -110,7 +154,9 @@ export default function App() {
           Content for Tab One
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <PastEvents />
+          <MeetingCard 
+            show_meetings={[chosenMeetings,chosenMeetings]}
+          />
         </TabPanel>
       </Box>
         <SpeedDial
@@ -149,15 +195,29 @@ export default function App() {
             Select meetings to add to {getData("name")}
           </DialogContentText>
           <FormGroup>
-            <FormControlLabel control={<Checkbox />} label="Label" />
-            <FormControlLabel control={<Checkbox />} label="Label" />
-            <FormControlLabel control={<Checkbox />} label="Label" />
-            <FormControlLabel control={<Checkbox />} label="Label" />
+          {meetings.length > 0 ? (
+        <ul>
+          {meetings.map((meeting, index) => (
+            <FormControlLabel
+              control={
+              <Checkbox 
+                checked={checkedMeetings.some(m => m.id === meeting.id)}
+                onChange={(e) => handleCheckboxChange(meeting, e.target.checked)}
+              />
+            }
+              key={index} 
+              label={meeting.summary + ' -- ADD DATE'}  />
+          
+          ))}
+        </ul>
+      ) : (
+        <p>No meetings found.</p>
+      )}
         </FormGroup>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Create</Button>
+          <Button type="submit" onClick={choseMeetings}>Create</Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>}
