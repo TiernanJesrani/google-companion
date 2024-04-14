@@ -46,14 +46,14 @@ class CalendarEvent(BaseModel):
     time: str
 
     def __str__(self):
-        return f"{self.name} at {self.time}"
+        return f"Event: {self.name} at {self.time}"
 
 class Meeting(CalendarEvent):
     attendees: list[str]
     transcript: str
 
     def __str__(self):
-        return f"{self.name} at {self.time} with {', '.join(self.attendees)}"
+        return f"Meeting: {self.name} at {self.time} with {', '.join(self.attendees)} \n Transcript: {self.transcript}"
 
 class Space(BaseModel):
     space_name: str

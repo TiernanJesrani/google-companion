@@ -14,7 +14,8 @@ creds = None
 def authenticate_create_token():
    # If modifying these scopes, delete the file token.json.
   SCOPES = ["https://www.googleapis.com/auth/calendar.readonly", "https://www.googleapis.com/auth/drive.readonly", 
-            "https://www.googleapis.com/auth/meetings.space.readonly", "https://www.googleapis.com/auth/meetings.space.created"]
+            "https://www.googleapis.com/auth/meetings.space.readonly", "https://www.googleapis.com/auth/meetings.space.created", 
+            "https://www.googleapis.com/auth/drive.metadata.readonly", "https://www.googleapis.com/auth/drive.file", 'https://www.googleapis.com/auth/tasks']
   global creds
   # The file token.json stores the user's access and refresh tokens, and is
   # created automatically when the authorization flow completes for the first

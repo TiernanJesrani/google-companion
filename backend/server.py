@@ -10,7 +10,11 @@ from google.meet import (
     get_transcripts,
     get_transcript_entries,
     get_conference_id,
-    conjoin_transcript_entries
+    conjoin_transcript_entries,
+)
+from google.docs import (
+    retrieve_doc_ids,
+    get_doc_content
 )
 from llm.companion import (
     Companion,
@@ -30,22 +34,35 @@ CORS(app)
 
 creds = None
 
+# working
 @app.route("/login-test")
 def login_test():
+    global creds
+    print("before")
     authenticate_create_token()
+    print('after')
     return jsonify("Login successful")
 
+# not being used
 @app.route("/spaces")
 def get_spaces():
+    global creds
+    print("before")
+    authenticate_create_token()
     spaces = database.get_spaces()
     return jsonify(spaces)
 
+
+# working
 @app.route("/spaces/<space_name>")
 def get_space(space_name: str):
     # get the contents of a space
     # - meetings
     # - calendar events
     # - documents (later)
+    global creds
+    print("before")
+    authenticate_create_token()
     space = database.get_space_from_name(space_name)
 
     # get the meetings in the space
@@ -57,6 +74,7 @@ def get_space(space_name: str):
         "meetings": meetings,
         "events": events
     })
+
 
 # view the users google worksapce stuff and choose what to add to a space
 @app.route("/add-to-space")
@@ -73,16 +91,30 @@ def view_workspace_entities():
         "meetings": meetings
     })
 
-# view the users' google 
+# view the users' google drive and choose which docs to add
+@app.route("/add-docs-to-space")
+def add_docs_to_space():
+    global creds
+
+    authenticate_create_token()
+    document_id_name_webViewLink = retrieve_doc_ids()
+    
+    return document_id_name_webViewLink
 
 @app.route("/add-space/<space_name>")
 def add_space(space_name: str):
+    global creds
+    print("before")
+    authenticate_create_token()
     print("Adding", space_name)
     database.add_space(space_name)
     return jsonify("Successfully added")
 
 def create_space(space_name: str):
     # get the space information
+    global creds
+    print("before")
+    authenticate_create_token()
     print("Space name", space_name)
     space = database.get_space_by_name(space_name)
     print("Retrieved space", space)
@@ -103,6 +135,7 @@ def create_space(space_name: str):
         meetings=meetings
     )
 
+# working
 @app.route("/get-summary/<space_name>/<meeting_id>")
 def get_summary(space_name, meeting_id):
 
@@ -119,8 +152,20 @@ def get_summary(space_name, meeting_id):
 
     return jsonify([item.point for item in summarizer.summarize_meeting(transcript).main_points])
 
+chat_companion = None
 
-def get_space_meetings(space_name: str):
-    # get the meetings a user added to a space
-    pass
+# just wrote it - working?
+@app.route("/<space_name>/chat")
+def get_response(space_name):
+    global creds
+    print("before")
+    authenticate_create_token()
+    global chat_companion
+    query = request.args.get('query')
+    if not chat_companion:
+        space = create_space(space_name)
+        chat_companion = ChatCompanion(space)
+    # use chat_companion
+    response = chat_companion(query, with_retrieval=True)
+    return response
 

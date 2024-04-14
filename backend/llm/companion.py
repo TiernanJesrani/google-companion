@@ -90,9 +90,17 @@ class ChatCompanion(GeminiClientWithMemory):
         super().__init__(model, api_key, debug=debug, structure=Response, system_message=system_message)
         self.space = space
         self.verbose = verbose
+        txt = ""
         if space.documents:
             docs = [doc.__str__() for doc in space.documents if doc and doc.content]
-            txt = "----\n".join(docs)
+            txt += "----\n".join(docs)
+        if space.calendar_events:
+            events = [event.__str__() for event in space.calendar_events if event]
+            txt += "----\n".join(txt)
+
+        print(f"Chat Companion initialized with access to space context: {txt}")
+
+        if txt != "":
             self.retriever = Retriever(chunk_text(txt))
 
     def __call__(self, prompt: str, with_retrieval: bool = True) -> str:
