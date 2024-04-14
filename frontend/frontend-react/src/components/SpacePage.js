@@ -21,6 +21,7 @@ import 'react-chatbot-kit/build/main.css'
 import config from './config.js';
 import MessageParser from '../components/MessageParser.js';
 import ActionProvider from './ActionProvider.js';
+import Document from './Documents.js';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -203,7 +204,9 @@ export default function App() {
           />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          Documents
+          <Document
+          documents={docs}
+          />
         </TabPanel>
         
       </Box>
