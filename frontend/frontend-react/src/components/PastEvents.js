@@ -48,7 +48,6 @@ function MeetingCard(props) {
     {show_meetings.map((meeting, index) => {
       return (
         <Accordion>
-          {console.log("testtest" + JSON.stringify(meeting))}
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1-content"

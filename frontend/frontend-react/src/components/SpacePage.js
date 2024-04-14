@@ -16,12 +16,11 @@ import Calendar from './Calendar';
 import googlemeet from '../static/images/google-meet.png'
 import docs from '../static/images/docs.png'
 import MeetingCard from './PastEvents'
-import Chat from './Chat';
 import Chatbot from 'react-chatbot-kit'
 import 'react-chatbot-kit/build/main.css'
-import config from '../bot/config.js';
-import MessageParser from '../bot/Messageparser.js';
-import ActionProvider from '../bot/ActionProvider.js';
+import config from './config.js';
+import MessageParser from '../components/MessageParser.js';
+import ActionProvider from './ActionProvider.js';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -59,6 +58,7 @@ export default function App() {
   const [error, setError] = React.useState(null);
   const [chosenMeetings, setChosenMeetings] = React.useState([]);
   const [checkedMeetings, setCheckedMeetings] = React.useState([]);
+  const [docs, setDocs] = React.useState([])
 
   const actions = [
     { 
@@ -67,7 +67,7 @@ export default function App() {
         onClick: () => prepAdd(true) 
     },
     { 
-      icon: <img src={docs} className="google-meet-icon" style={{ width: '24px', height: '24px' }} alt="Doocuments" />, 
+      icon: <img src={docs} className="docs-icon" style={{ width: '24px', height: '24px' }} alt="Documents" />, 
       name: 'Documents', 
       onClick: () => prepAdd(true) 
     } 
@@ -119,6 +119,24 @@ export default function App() {
         setError(error.toString());
         setIsLoading(false);
       });
+
+
+    fetch('http://127.0.0.1:5000/add-docs-to-space')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to load data');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("docs" + JSON.stringify(data[15]))
+      setDocs(data)
+    })
+    .catch(error => {
+      console.error("Error fetching data", error);
+      setError(error.toString());
+      setIsLoading(false);
+    });
   }, []);
 
   function getData(param) {
@@ -159,8 +177,24 @@ export default function App() {
           <Tab label="Past Events" {...a11yProps(1)} />
           <Tab label="Documents" {...a11yProps(2)} />
         </Tabs>
-        <TabPanel value={value} index={0}>
-          <Chat />
+        <TabPanel value={value} index={0} >
+          <div style={{ height: '100%', // Ensures the div fills the height of its container
+            width: '100%', // Ensures the div fills the width of its container
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px' }} >
+      
+        <Chatbot
+          config={config}
+          messageParser={MessageParser}
+          actionProvider={ActionProvider}
+          style={{
+            width: '100%', // Ensures Chatbot fills the width of its container
+            height: '100%' // Ensures Chatbot fills the height of its container
+          }}
+      /></div>
         </TabPanel>
         <TabPanel value={value} index={1}>
           <MeetingCard 

@@ -13,6 +13,7 @@ from google.meet import (
     conjoin_transcript_entries,
 )
 from google.docs import (
+    authenticate_and_create_token_1,
     retrieve_doc_ids,
     get_doc_content
 )
@@ -96,7 +97,7 @@ def view_workspace_entities():
 def add_docs_to_space():
     global creds
 
-    authenticate_create_token()
+    authenticate_and_create_token_1()
     document_id_name_webViewLink = retrieve_doc_ids()
     
     return document_id_name_webViewLink

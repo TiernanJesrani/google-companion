@@ -18,6 +18,16 @@ function Home() {
   const [showCreate, setShowCreate] = useState(false)
   const [spaceName, setSpacetName] = useState("")
 
+  if (localStorage.getItem('loggedIn')!== "true") {
+    console.log("logging in")
+    fetch('http://127.0.0.1:5000/login-test').then((response) => {
+      if (!response.ok) console.log(response);
+      console.log(response)
+      localStorage.setItem('loggedIn', "true");
+      return response.json();
+    })
+  }
+
   function clearStorage() {
     console.log(localStorage.getItem('loggedIn'))
     console.log('Clearing sotrage')
@@ -88,16 +98,6 @@ function Home() {
       return response.json();
     })
   };
-  if (localStorage.getItem('loggedIn')!== "true") {
-    console.log("logging in")
-    fetch('http://127.0.0.1:5000/login-test').then((response) => {
-      if (!response.ok) console.log(response);
-      console.log(response)
-      localStorage.setItem('loggedIn', "true");
-      return response.json();
-    })
-  }
-
   return (
     
     <div className="App">
