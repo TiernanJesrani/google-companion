@@ -100,7 +100,7 @@ def add_docs_to_space():
 
     authenticate_and_create_token_1()
     document_id_name_webViewLink = retrieve_doc_ids()
-    
+    print(document_id_name_webViewLink)
     return document_id_name_webViewLink
 
 @app.route("/add-space/<space_name>")
@@ -148,6 +148,8 @@ def get_summary(space_name, meeting_id):
     attendees_entries = get_transcript_information(events_with_meets)
 
     # get the meeting id the user wants
+    print("attendees_entries:")
+    print(attendees_entries)
     transcript = attendees_entries[meeting_id]
     space = create_space(space_name)
     summarizer = Companion(space)

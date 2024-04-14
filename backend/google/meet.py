@@ -15,7 +15,8 @@ def authenticate_create_token():
    # If modifying these scopes, delete the file token.json.
   SCOPES = ["https://www.googleapis.com/auth/calendar.readonly", "https://www.googleapis.com/auth/drive.readonly", 
             "https://www.googleapis.com/auth/meetings.space.readonly", "https://www.googleapis.com/auth/meetings.space.created", 
-            "https://www.googleapis.com/auth/drive.metadata.readonly", "https://www.googleapis.com/auth/drive.file", 'https://www.googleapis.com/auth/tasks']
+            "https://www.googleapis.com/auth/drive.metadata.readonly", "https://www.googleapis.com/auth/drive.file", 'https://www.googleapis.com/auth/tasks',
+            "https://www.googleapis.com/auth/calendar"]
   global creds
   # The file token.json stores the user's access and refresh tokens, and is
   # created automatically when the authorization flow completes for the first
@@ -75,6 +76,7 @@ def get_events():
             maxResults=30,
             singleEvents=True,
             orderBy="startTime",
+            showDeleted=False
         )
         .execute()
     )
@@ -101,7 +103,7 @@ def get_events_with_meets():
   for event in events:
       if "hangoutLink" in event:
         events_with_meets.append(event)
-  
+  print(events_with_meets)
   return events_with_meets
 
 
@@ -112,10 +114,11 @@ def get_transcript_information(events):
     
     # get the space associated with an event
     space = get_space(event)
-    print("Space: ", space)
+  
     # get the records associated with that space
     conference_records = get_conference_records(space)
-    print("Conference records: ", conference_records)
+    
+    
     if len(conference_records) == 0:
       print("empty")
     else:
@@ -128,9 +131,11 @@ def get_transcript_information(events):
       else:
       # get all the transcript entries for all the transcripts
         transcript_entries = get_transcript_entries(transcripts)
+        
 
         transcript_info[get_conference_id(event)] = conjoin_transcript_entries(transcript_entries)
-    
+
+        
   return transcript_info
 
     
@@ -193,14 +198,15 @@ def get_transcripts(conference_records):
         parent=record
       ) 
       transcripts_for_one_conference = client_rec.list_transcripts(request=request)
-      print("transcripts_for_one_conference", transcripts_for_one_conference)
+      #print("transcripts_for_one_conference", transcripts_for_one_conference)
       if not transcripts_for_one_conference.transcripts:
+        #print("testing skip")
         continue
-      
+        
       else:
         for transcript in transcripts_for_one_conference:
           transcripts.append(transcript)
-        return transcripts
+    return transcripts
   
   except HttpError as error:
     print(f"An error occurred: {error}")
@@ -275,17 +281,20 @@ def conjoin_transcript_entries(transcript_entries):
   attendee_entry = []
   attendee_entry.append(attendees)
   attendee_entry.append(entries)
+
+
   return entries
 
 
 def main():
   authenticate_create_token()
   events = get_events()
-  print(events)
+  #print(events)
+  
 
   events_with_meets = get_events_with_meets()
   attendees_entries = get_transcript_information(events_with_meets)
-  print(attendees_entries)
+  #print(attendees_entries)
 
 
 if __name__ == '__main__':

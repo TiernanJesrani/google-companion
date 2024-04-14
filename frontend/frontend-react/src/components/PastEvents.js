@@ -15,32 +15,53 @@ function MeetingCard(props) {
   const [item, setItem] = useState("")
   const [items, setItems] = useState(Array(10))
 
+  // function summarize(name, id, index) {
+  //   fetch(`http://127.0.0.1:5000/get-summary/${name}/${id}`)
+  //     .then(response => {
+  //       if (!response.ok) {
+  //         throw new Error('Failed to load data');
+  //       }
+  //       let text = response.json()
+  //       setSummaries([...[name,text]])
+  //       return text
+  //     })
+  //     .then(data => {
+
+  //       console.log(data[0])
+  //       let temp_items = items
+  //       temp_items[index] = data[0]
+  //       setItems(temp_items)
+        
+  //     })
+  //     .catch(error => {
+  //       console.error("Error fetching data", error);
+  //     });
+  // }
+
+  // if (show_meetings.length === 0 || show_meetings[0].length === 0) {
+  //   console.log("none")
+  //   return <h1>Select meetings to add!</h1>
+  // }
+
   function summarize(name, id, index) {
     fetch(`http://127.0.0.1:5000/get-summary/${name}/${id}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to load data');
         }
-        let text = response.json()
-        setSummaries([...[name,text]])
-        return text
+        return response.json(); // Return the parsed JSON
       })
       .then(data => {
-
-        console.log(data[0])
-        let temp_items = items
-        temp_items[index] = data[0]
-        setItems(temp_items)
-        
+        console.log(data[0]);
+        setItems(prevItems => {
+          const tempItems = [...prevItems]; // Create a copy of the state array
+          tempItems[index] = data[0]; // Update the copy
+          return tempItems; // Set the updated copy as the new state
+        });
       })
       .catch(error => {
         console.error("Error fetching data", error);
       });
-  }
-
-  if (show_meetings.length === 0 || show_meetings[0].length === 0) {
-    console.log("none")
-    return <h1>Select meetings to add!</h1>
   }
   return (
     <Box>
