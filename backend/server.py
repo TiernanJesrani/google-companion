@@ -30,8 +30,6 @@ CORS(app)
 
 creds = None
 
-creds = None
-
 @app.route("/login-test")
 def login_test():
     authenticate_create_token()
@@ -60,31 +58,42 @@ def get_space(space_name: str):
         "events": events
     })
 
-@app.route("/add")
+# view the users google worksapce stuff and choose what to add to a space
+@app.route("/add-to-space")
 def view_workspace_entities():
     global creds
     print("Fetch events/meetings")
     authenticate_create_token()
     meetings = get_events_with_meets()
     transcript = get_transcript_information(meetings)
-    #print("#meetings#", meetings)
+    #print("#meetings#", meetings)ß
     #print("#transcript#", transcript)
     return jsonify({
         "transcripts": transcript,
         "meetings": meetings
     })
 
+# view the users' google 
+
+@app.route("/add-space/<space_name>")
+def add_space(space_name: str):
+    print("Adding", space_name)
+    database.add_space(space_name)
+    return jsonify("Successfully added")
+
 def create_space(space_name: str):
     # get the space information
+    print("Space name", space_name)
     space = database.get_space_by_name(space_name)
-    space_name = space["name"]
-    space_description = space["description"]
-    space_id = space["id"]
+    print("Retrieved space", space)
+    space_name = space[1]
+    space_id = space[0]
+    space_description = space[2]
 
     # get the meetings in the space
     meetings = database.get_space_meetings(space_id)
-    events = database.get_space_events(space_id)
-    documents = database.get_space_documents(space_id)
+    events = database.get_calendar_events(space_id)
+    documents = database.get_documents(space_id)
 
     return Space(
         space_name=space_name,
@@ -96,6 +105,7 @@ def create_space(space_name: str):
 
 @app.route("/get-summary/<space_name>/<meeting_id>")
 def get_summary(space_name, meeting_id):
+
     # get the transcript information of the meeting
     global creds
     authenticate_create_token()
@@ -107,7 +117,7 @@ def get_summary(space_name, meeting_id):
     space = create_space(space_name)
     summarizer = Companion(space)
 
-    return jsonify(summarizer.summarize_meeting(transcript))
+    return jsonify([item.point for item in summarizer.summarize_meeting(transcript).main_points])
 
 
 def get_space_meetings(space_name: str):

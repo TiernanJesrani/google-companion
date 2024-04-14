@@ -10,7 +10,8 @@ def _init_db():
     c.execute('''
         CREATE TABLE IF NOT EXISTS spaces (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE
+            name TEXT NOT NULL UNIQUE,
+            description TEXT
         )
     ''')
     c.execute('''
@@ -89,6 +90,17 @@ def get_space_meetings(space_id):
     conn.close()
     return meetings
 
+def get_space_events(space_id):
+    conn = create_connection()
+    c = conn.cursor()
+    c.execute('''
+        SELECT * FROM calendar_events WHERE space_id = ?
+    ''', (space_id,))
+    events = c.fetchall()
+    conn.close()
+    return events
+
+
 def add_meeting(name, space_id):
     conn = create_connection()
     c = conn.cursor()
@@ -153,9 +165,12 @@ if __name__ == "__main__":
     # optional: add some test data
     add_space("Test Space 1")
     add_space("Big Stepper")
+    add_space("googlemhacks-hackthon")
 
     add_meeting("meeting with drake", 1)
     add_meeting("meeting with future", 1)
+    add_meeting("midnight coding sesh", 3)
 
     add_calendar_event("event with drake", 2)
     add_calendar_event("event with future", 1)
+    add_calendar_event("bodega brothers mashallah", 3)

@@ -16,6 +16,12 @@ import Calendar from './Calendar';
 import googlemeet from '../static/images/google-meet.png'
 import docs from '../static/images/docs.png'
 import MeetingCard from './PastEvents'
+import Chat from './Chat';
+import Chatbot from 'react-chatbot-kit'
+import 'react-chatbot-kit/build/main.css'
+import config from '../bot/config.js';
+import MessageParser from '../bot/Messageparser.js';
+import ActionProvider from '../bot/ActionProvider.js';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -94,16 +100,18 @@ export default function App() {
   React.useEffect(() => {
     setIsLoading(true);
     console.log("fetching")
-    fetch('http://127.0.0.1:5000/add')
+    fetch('http://127.0.0.1:5000/add-to-space')
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to load data');
         }
-        console.log('dub')
         return response.json();
       })
       .then(data => {
-        setMeetings(data.meetings);
+        console.log("fetching meeting: ")
+        console.log(typeof meetings)
+        console.log(data.meetings)
+        setMeetings((data.meetings));
         setIsLoading(false);
       })
       .catch(error => {
@@ -147,17 +155,23 @@ export default function App() {
        
         </Breadcrumbs>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered>
-          <Tab label="Upcoming" {...a11yProps(0)} />
+          <Tab label="Space Home" {...a11yProps(0)} />
           <Tab label="Past Events" {...a11yProps(1)} />
+          <Tab label="Documents" {...a11yProps(2)} />
         </Tabs>
         <TabPanel value={value} index={0}>
-          Content for Tab One
+          <Chat />
         </TabPanel>
         <TabPanel value={value} index={1}>
           <MeetingCard 
-            show_meetings={[chosenMeetings,chosenMeetings]}
+            show_meetings={chosenMeetings}
+            name={route.pathname.split('/')[2]}
           />
         </TabPanel>
+        <TabPanel value={value} index={2}>
+          Documents
+        </TabPanel>
+        
       </Box>
         <SpeedDial
             ariaLabel="SpeedDial basic example"
@@ -197,6 +211,7 @@ export default function App() {
           <FormGroup>
           {meetings.length > 0 ? (
         <ul>
+          {console.log(meetings.length)}
           {meetings.map((meeting, index) => (
             <FormControlLabel
               control={

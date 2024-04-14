@@ -57,7 +57,7 @@ class Meeting(CalendarEvent):
 
 class Space(BaseModel):
     space_name: str
-    user_name: str
+    user_name: str = None
     description: str | None = None
     calendar_events: list[CalendarEvent] | None = None
     documents: list[Document] | None = None

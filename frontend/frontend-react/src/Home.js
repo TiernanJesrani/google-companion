@@ -16,6 +16,7 @@ import campus from './static/images/campus.jpeg'
 
 function Home() {
   const [showCreate, setShowCreate] = useState(false)
+  const [spaceName, setSpacetName] = useState("")
 
   function clearStorage() {
     console.log(localStorage.getItem('loggedIn'))
@@ -61,6 +62,7 @@ function Home() {
   }
 
   const handleClose = (name) => {
+    setSpacetName(name)
     let date = new Date();
     let formatter = new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
@@ -68,6 +70,7 @@ function Home() {
       day: 'numeric'
     });
     console.log(`Created ${name} at ${formatter.format(date)}`); 
+
     setGridItems(gridItems => [...gridItems, 
       {
       "name": name,
@@ -79,8 +82,12 @@ function Home() {
       }
     ])
     setShowCreate(false);
+    fetch(`http://127.0.0.1:5000/add-space/${name}`).then((response) => {
+      if (!response.ok) console.log(response);
+      console.log(response)
+      return response.json();
+    })
   };
-
   if (localStorage.getItem('loggedIn')!== "true") {
     console.log("logging in")
     fetch('http://127.0.0.1:5000/login-test').then((response) => {
@@ -90,6 +97,7 @@ function Home() {
       return response.json();
     })
   }
+
   return (
     
     <div className="App">
@@ -148,7 +156,7 @@ function Home() {
             margin="dense"
             id="name"
             name="name"
-            label="John Doe"
+            label="Your space name"
             type="text"
             fullWidth
             variant="standard"
