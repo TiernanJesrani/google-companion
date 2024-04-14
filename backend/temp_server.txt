@@ -86,7 +86,8 @@ def view_workspace_entities():
     authenticate_create_token()
     meetings = get_events_with_meets()
     transcript = get_transcript_information(meetings)
-
+    #print("#meetings#", meetings)ß
+    #print("#transcript#", transcript)
     return jsonify({
         "transcripts": transcript,
         "meetings": meetings
@@ -133,7 +134,7 @@ def create_space(space_name: str):
         description=space_description,
         calendar_events=events,
         documents=documents,
-        meetings=meetings,
+        meetings=meetings
     )
 
 # working
@@ -147,21 +148,11 @@ def get_summary(space_name, meeting_id):
     attendees_entries = get_transcript_information(events_with_meets)
 
     # get the meeting id the user wants
-    #print("attendees_entries:")
-    #print(attendees_entries)
+    print("attendees_entries:")
+    print(attendees_entries)
     transcript = attendees_entries[meeting_id]
     space = create_space(space_name)
     summarizer = Companion(space)
-
-    space_id = get_space(space_name)['space_id']
-
-    print(space_id)
-    print()
-    print("transcript")
-    
-    temp = " ".join(transcript) 
-    print(transcript)
-    database.add_meeting(meeting_id, space_id, temp)
 
     return jsonify([item.point for item in summarizer.summarize_meeting(transcript).main_points])
 
@@ -189,19 +180,13 @@ def get_response(space_name):
     print(space_id)
     context = database.get_documents(space_id)
 
-    meetings = database.get_space_meetings(space_id)
-    transcripts = [meeting[3] for meeting in meetings]
-    print("Transcripts:", transcripts)
-
-    context += transcripts
-
     print("Context:", context)
 
     query = f"""
         Question: {query}
         Context: {context}
     """
-
+    print(query)
     response : Response = responder(query, structure=Response)
     print("LLM Response:", response)
 
