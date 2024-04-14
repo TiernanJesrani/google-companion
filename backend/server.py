@@ -58,6 +58,40 @@ def view_workspace_entities():
         "meetings": meetings
     })
 
+def create_space(space_name: str):
+    # get the space information
+    space = database.get_space_by_name(space_name)
+    space_name = space["name"]
+    space_description = space["description"]
+    space_id = space["id"]
+
+    # get the meetings in the space
+    meetings = database.get_space_meetings(space_id)
+    events = database.get_space_events(space_id)
+    documents = database.get_space_documents(space_id)
+
+    return Space(
+        space_name=space_name,
+        description=space_description,
+        calendar_events=events,
+        documents=documents,
+        meetings=meetings
+    )
+
+@app.route("/get-summary/<space_name>/<meeting_id>")
+def get_summary(space_name, meeting_id):
+    # get the transcript information of the meeting
+    authenticate_create_token()
+    events_with_meets = get_events_with_meets()
+    attendees_entries = get_transcript_information(events_with_meets)
+
+    # get the meeting id the user wants
+    transcript = attendees_entries[meeting_id]
+    space = create_space(space_name)
+    summarizer = Companion(space)
+
+    return jsonify(summarizer.summarize_meeting(transcript))
+
 
 def get_space_meetings(space_name: str):
     # get the meetings a user added to a space
