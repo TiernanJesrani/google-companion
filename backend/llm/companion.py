@@ -87,7 +87,7 @@ class ChatCompanion(GeminiClientWithMemory):
                        system_message: str = prompts.SYSTEM_MESSAGE,
                        verbose: bool = False):
 
-        super().__init__(model, api_key, debug=debug, structure=Response, system_message=system_message)
+        super().__init__(model, api_key, debug=debug, structure=Response, system_message=system_message, verbose=True)
         self.space = space
         self.verbose = verbose
         txt = ""
@@ -113,6 +113,7 @@ class ChatCompanion(GeminiClientWithMemory):
             """
 
         response = super().__call__(prompt, structure=Response)
+        print("REsp:", response)
         return response.content
 
 

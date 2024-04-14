@@ -35,15 +35,15 @@ SCHEMAS FOR CONTEXT ABOUT SPACES
 
 class Document(BaseModel):
     name: str
-    content: str
+    content: str = None
 
     def __str__(self):
         return f"{self.name}: \n {self.content}"
 
 class CalendarEvent(BaseModel):
     name: str
-    description: str
-    time: str
+    description: str = None
+    time: str = None
 
     def __str__(self):
         return f"Event: {self.name} at {self.time}"

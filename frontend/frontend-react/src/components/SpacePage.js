@@ -33,9 +33,12 @@ function TabPanel(props) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       {...other}
+      style={{
+        height: "100%"
+      }}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: 3, height: '100%' }}>
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -130,7 +133,6 @@ export default function App() {
       return response.json();
     })
     .then(data => {
-      console.log("docs" + JSON.stringify(data[15]))
       setDocs(data)
     })
     .catch(error => {
@@ -178,25 +180,39 @@ export default function App() {
           <Tab label="Past Events" {...a11yProps(1)} />
           <Tab label="Documents" {...a11yProps(2)} />
         </Tabs>
-        <TabPanel value={value} index={0} >
-          <div style={{ height: '100%', // Ensures the div fills the height of its container
-            width: '100%', // Ensures the div fills the width of its container
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '24px' }} >
-      
-        <Chatbot
-          config={config}
-          messageParser={MessageParser}
-          actionProvider={ActionProvider}
-          style={{
-            width: '100%', // Ensures Chatbot fills the width of its container
-            height: '100%' // Ensures Chatbot fills the height of its container
-          }}
-      /></div>
-        </TabPanel>
+        <TabPanel value={value} index={0} sx={{height:'100%'}}>
+  <style>
+    {`
+      .react-chatbot-kit-chat-container {
+          width: 100%;
+          height: 100%;
+      }
+      .react-chatbot-kit-chat-inner-container {
+          width: 100%;
+          height: 100%;
+      }
+      /* Add more overrides here */
+    `}
+  </style>
+  <div style={{
+    height: '100%',
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '24px'
+  }}>
+    <Chatbot
+      config={config}
+      messageParser={MessageParser}
+      actionProvider={ActionProvider}
+      space={route}
+      style={{ width: '100%', height: '100%' }}  // Ensure the Chatbot also fills the div
+    />
+  </div>
+</TabPanel>
+
         <TabPanel value={value} index={1}>
           <MeetingCard 
             show_meetings={chosenMeetings}

@@ -34,6 +34,7 @@ def _init_db():
         CREATE TABLE IF NOT EXISTS documents (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            content TEXT,
             space_id INTEGER NOT NULL,
             FOREIGN KEY(space_id) REFERENCES spaces(id)
         )
@@ -139,12 +140,12 @@ def get_calendar_events(space_id):
     conn.close()
     return calendar_events
 
-def add_document(name, space_id):
+def add_document(name, space_id, content):
     conn = create_connection()
     c = conn.cursor()
     c.execute('''
-        INSERT INTO documents (name, space_id) VALUES (?, ?)
-    ''', (name, space_id))
+        INSERT INTO documents (name, space_id, content) VALUES (?, ?, ?)
+    ''', (name, space_id, content))
     conn.commit()
     conn.close()
 
@@ -166,10 +167,12 @@ if __name__ == "__main__":
     add_space("Test Space 1")
     add_space("Big Stepper")
     add_space("googlemhacks-hackthon")
+    add_space("temu")
 
     add_meeting("meeting with drake", 1)
     add_meeting("meeting with future", 1)
     add_meeting("midnight coding sesh", 3)
+    add_meeting("getting scammed", 4)
 
     add_calendar_event("event with drake", 2)
     add_calendar_event("event with future", 1)

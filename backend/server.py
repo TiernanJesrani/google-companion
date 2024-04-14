@@ -64,16 +64,17 @@ def get_space(space_name: str):
     global creds
     print("before")
     authenticate_create_token()
-    space = database.get_space_from_name(space_name)
+    space = database.get_space_by_name(space_name)
 
     # get the meetings in the space
-    space_id = space["id"]
+    space_id = space[0]
     meetings = database.get_space_meetings(space_id)
     events = database.get_space_events(space_id)
 
-    return jsonify({
+    return ({
         "meetings": meetings,
-        "events": events
+        "events": events,
+        "space_id": space_id
     })
 
 
@@ -163,10 +164,56 @@ def get_response(space_name):
     authenticate_create_token()
     global chat_companion
     query = request.args.get('query')
-    if not chat_companion:
-        space = create_space(space_name)
-        chat_companion = ChatCompanion(space)
-    # use chat_companion
-    response = chat_companion(query, with_retrieval=True)
-    return response
+    print("Query:", query)
+    # if not chat_companion:
+    #     space = create_space(space_name)
+    #     chat_companion = ChatCompanion(space)
+    # # use chat_companion
+    # response = chat_companion(query, with_retrieval=False)
+    from llm.wrappers.gemini_chat import GeminiClient
+    responder = GeminiClient(verbose=True)
+    print("Getting space:", space_name)
+    space = get_space(space_name)
+    space_id = space['space_id']
+    print(space_id)
+    context = database.get_documents(space_id)
 
+    print("Context:", context)
+
+    query = f"""
+        Question: {query}
+        Context: {context}
+    """
+
+    response : Response = responder(query, structure=Response)
+    print("LLM Response:", response)
+
+    return jsonify(response.content)
+
+@app.route("/<space_name>/add-doc", methods=['POST'])
+def add_doc_to_space(space_name):
+    global creds
+    print("before")
+    authenticate_create_token()
+    authenticate_and_create_token_1()
+    data = request.get_json()  # Parse JSON from the request body
+    doc_ids = data.get('documentIds', [])
+    print('Received document IDs:', doc_ids)
+    doc_ids_2 = [{'id': id} for id in doc_ids]
+    print('###', doc_ids_2)
+    doc_contents = get_doc_content(doc_ids_2)
+
+    space = get_space(space_name)
+    space_id = space['space_id']
+
+    for doc_id, doc in zip(doc_ids, doc_contents):
+        database.add_document(doc_id, space_id, doc)
+
+    # for doc_id in doc_ids:
+    #     doc_content = get_doc_content([{'id': doc_id}])
+    #     print("doc content", doc_content)
+    #     # get space id from space name
+    #     space = get_space(space_name)
+    #     space_id = space['space_id']
+    #     database.add_document(doc_id, space_id, doc_content)
+    return jsonify("Successfully added doc to space")
