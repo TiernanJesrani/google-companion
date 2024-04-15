@@ -127,6 +127,7 @@ def create_space(space_name: str):
     # get the meetings in the space
     meetings = database.get_space_meetings(space_id)
     events = database.get_calendar_events(space_id)
+    # error here, need to fix
     documents = database.get_documents(space_id)
 
     return Space(
@@ -148,8 +149,8 @@ def get_summary(space_name, meeting_id):
     attendees_entries = get_transcript_information(events_with_meets)
 
     # get the meeting id the user wants
-    print("attendees_entries:")
-    print(attendees_entries)
+    # print("attendees_entries:")
+    # print(attendees_entries)
     transcript = attendees_entries[meeting_id]
     space = create_space(space_name)
     summarizer = Companion(space)
@@ -195,12 +196,14 @@ def get_response(space_name):
 @app.route("/<space_name>/add-doc", methods=['POST'])
 def add_doc_to_space(space_name):
     global creds
-    print("before")
+    
     authenticate_create_token()
     authenticate_and_create_token_1()
     data = request.get_json()  # Parse JSON from the request body
     doc_ids = data.get('documentIds', [])
     print('Received document IDs:', doc_ids)
+
+    # need to change
     doc_ids_2 = [{'id': id} for id in doc_ids]
     print('###', doc_ids_2)
     doc_contents = get_doc_content(doc_ids_2)
