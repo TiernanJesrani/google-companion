@@ -164,16 +164,16 @@ if __name__ == "__main__":
     _init_db()
 
     # optional: add some test data
-    # add_space("Test Space 1")
-    # add_space("Big Stepper")
-    # add_space("googlemhacks-hackthon")
-    # add_space("temu")
+    add_space("Test Space 1")
+    add_space("Big Stepper")
+    add_space("googlemhacks-hackthon")
+    add_space("temu")
 
-    # add_meeting("meeting with drake", 1)
-    # add_meeting("meeting with future", 1)
-    # add_meeting("midnight coding sesh", 3)
-    # add_meeting("getting scammed", 4)
+    add_meeting("meeting with drake", 1)
+    add_meeting("meeting with future", 1)
+    add_meeting("midnight coding sesh", 3)
+    add_meeting("getting scammed", 4)
 
-    # add_calendar_event("event with drake", 2)
-    # add_calendar_event("event with future", 1)
-    # add_calendar_event("bodega brothers mashallah", 3)
+    add_calendar_event("event with drake", 2)
+    add_calendar_event("event with future", 1)
+    add_calendar_event("bodega brothers mashallah", 3)

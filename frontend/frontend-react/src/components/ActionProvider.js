@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const ActionProvider = ({ createChatBotMessage, setState, children }) => {
+    const route = useLocation()
     const handleHello = (message) => {
         // Fetch the data from your endpoint
         console.log("message: " + message)
-        fetch(`http://127.0.0.1:5000/temu/chat?query=${encodeURIComponent(message)}`)
+        fetch(`http://127.0.0.1:5000/${route.split('/')[2]}/chat?query=${encodeURIComponent(message)}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Failed to load data');

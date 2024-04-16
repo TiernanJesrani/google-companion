@@ -92,18 +92,15 @@ function Home() {
       }
     ])
     setShowCreate(false);
-<<<<<<< Updated upstream
     fetch(`http://127.0.0.1:5000/add-space/${name}`).then((response) => {
-=======
+      if (!response.ok) console.log(response);
+      console.log(response)
+  })
   };
-<<<<<<< HEAD
 
-=======
->>>>>>> 869c13f (test-715pm)
   if (localStorage.getItem('loggedIn')!== "true") {
     console.log("logging in")
     fetch('http://127.0.0.1:5000/login-test').then((response) => {
->>>>>>> Stashed changes
       if (!response.ok) console.log(response);
       console.log(response)
       return response.json();

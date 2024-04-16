@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+
 import { FormGroup, FormControlLabel, Checkbox, Button } from '@mui/material';
 import DriveIcon from '../static/images/docs.png'; // Assuming you're using MUI icons
 
 export default function Document(props) {
     const [selectedDocs, setSelectedDocs] = useState([]); // State to keep track of selected documents
-
+    const route  = useLocation()
     const docs = props.documents; // Use const to declare docs
 
     // Function to handle checkbox changes
@@ -20,7 +22,7 @@ export default function Document(props) {
     const handleSubmit = () => {
         // Use fetch to send data to your endpoint
         console.log(selectedDocs)
-        fetch('http://127.0.0.1:5000/temu/add-doc', {
+        fetch(`http://127.0.0.1:5000/${route.split('/')[2]}/add-doc`, {
         method: 'POST', // Use POST method
         headers: {
             'Content-Type': 'application/json'
